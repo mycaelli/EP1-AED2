@@ -38,6 +38,22 @@ typedef struct
 } VERTICE;
 
 
+/*
+	N = Grafo de N vertices
+	A = Grafo de A arestas
+	*ijpeso = Representa as arestas (tamanho 3 * A)
+		- onde: 
+			i = vertice origem
+			j = vertice destino 
+			peso
+		ex: A = 2, ijpeso={1,2,3,4,5,6}
+			grafo g possui uma aresta entre os vertices 1 e 2 com peso 3
+			e possui uma aresta entre os vertices 4 e 5 com peso 6
+	*aberto = indica se os vertices estao abertos ou fechados
+		- contem apenas valores 0 ou 1
+	inicio, fim = busca
+	chave = vertice chave
+*/
 // funcao principal
 NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int chave);
 
