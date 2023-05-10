@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <malloc.h>
 
+// lib de bool
+
 int grupo() {
   return 0;
 }
@@ -37,6 +39,44 @@ typedef struct
     NO* inicio;
 } VERTICE;
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+	funcao cria N vertices
+	inicializa seus campos com 0
+	define se o vertice esta aberto ou fechado a partir do array estaAberto
+*/
+VERTICE *criaVetices(int N, int *estaAberto) {
+	VERTICE *g = (VERTICE*) malloc(sizeof(VERTICE) * N);
+	for (int i = 0; i < N; i++) {
+		g[i].flag = 0;
+		g[i].via = 0;
+		g[i].dist = 0;
+		g[i].inicio = NULL;
+		aberto[i] = estaAberto[i];
+	}
+	return g;
+}
+
+/*
+	funcao que insere as arestas no grafo
+	ex primeira chamada -> i = 0
+		origem = ijpeso[0 * 3]
+		destino = ijpeso[0 * 3 + 1]
+		peso = ijpeso[0 * 3 + 2]
+
+*/
+void insereArestas(VERTICE *g, int atual, int *ijpeso) {
+	int origem = ijpeso[atual*3];
+	int destino = ijpeso[atual*3+1];
+	int peso = ijpeso[atual*3+2];
+	
+	NO *novoNo = (NO*)malloc(sizeof(NO));
+	novoNo->adj = destino;
+	novoNo->peso = peso;
+	novoNo->prox = g[origem].inicio;
+	g[origem].inicio = novoNo;
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
 	N = Grafo de N vertices
@@ -57,7 +97,6 @@ typedef struct
 // funcao principal
 NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int chave);
 
-
 //------------------------------------------
 // O EP consiste em implementar esta funcao
 // e outras funcoes auxiliares que esta
@@ -70,6 +109,10 @@ NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int cha
 
 	// seu codigo AQUI
 
+	VERTICE* g = criaVetices(N, aberto);
+	for (int i = 0; i < A; i++) {
+		insereArestas(g, i, ijpeso)
+	}
 	//...
 
 	return resp;
