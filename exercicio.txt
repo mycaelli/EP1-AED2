@@ -1,0 +1,12 @@
+grafo não-dirigido ponderado
+
+formado por:
+    salas (vértices)
+        - salas podem estar trancada ou não
+            - acesso às salas trancadas só é permitido se o agente tiver obtido previamente a chave de acesso
+                - chave dá acesso automático a todas as salas trancadas do ambiente
+                - é adquirida pelo agente quando este passa pela sala marcada como chave
+    ligações entre elas (arestas)
+        - associada a um custo de deslocamento representado pelo peso da aresta
+
+O ambiente deve ser percorrido por um agente de software (e.g., um robô) a partir de uma sala marcada como início até a sala marcada como fim
