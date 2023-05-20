@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
+#include <limits.h> /*pode incluir?*/
 
 // lib de bool
 
@@ -50,7 +51,7 @@ VERTICE *criaVetices(int N, int *estaAberto) {
 	for (int i = 0; i < N; i++) {
 		g[i].flag = 0;
 		g[i].via = 0;
-		g[i].dist = 0;
+		g[i].dist = INT_MAX;
 		g[i].inicio = NULL;
 		aberto[i] = estaAberto[i];
 	}
@@ -82,10 +83,6 @@ void insereArestas(VERTICE *g, int atual, int *ijpeso) {
 	N = Grafo de N vertices
 	A = Grafo de A arestas
 	*ijpeso = Representa as arestas (tamanho 3 * A)
-		- onde: 
-			i = vertice origem
-			j = vertice destino 
-			peso
 		ex: A = 2, ijpeso={1,2,3,4,5,6}
 			grafo g possui uma aresta entre os vertices 1 e 2 com peso 3
 			e possui uma aresta entre os vertices 4 e 5 com peso 6
@@ -96,6 +93,7 @@ void insereArestas(VERTICE *g, int atual, int *ijpeso) {
 */
 // funcao principal
 NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int chave);
+int encontraMenorDistancia(VERTICE *g, int N);
 
 //------------------------------------------
 // O EP consiste em implementar esta funcao
@@ -106,18 +104,75 @@ NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int cha
 {
 	NO* resp;
 	resp = NULL;
+	bool temChave = false;
 
 	// seu codigo AQUI
 
+	/*
+		inicializa grafo
+	*/
 	VERTICE* g = criaVetices(N, aberto);
 	for (int i = 0; i < A; i++) {
 		insereArestas(g, i, ijpeso)
 	}
 	//...
 
+	/*dist da origem pra ela mesma*/
+	g[inicio].dist = 0;
+
+	for (int i = 0; i < N; i++) {
+		/*encontra o vertice nao visitado com menor dist*/
+		int u = encontraMenorDistancia(g, N);
+
+		/*
+			se o vertice onde vai fazer a busca nao estiver aberto, pula ele
+		*/
+		if (g[u].aberto && temChave == false) {
+			temChave = true;
+		} else if (!g[u].aberto && temChave == false){
+			continue;
+		} 
+		/* marca o vertice atual como visitado */
+		g[u].flag = 1;
+		
+		NO* p = grafo[u].inicio;
+		while(p) {
+			int adj = p->adj;
+			int peso = p->peso;
+
+			/*
+				se
+					vertice atual nao foi visitado
+					dist do vertice atual nao é infinito -> evita erro de overflow
+					dist do vertice atual é menor que dist do vertice adj
+
+						dist do vertice adj é a dist do vertice atual + peso do vertice adj
+			*/
+			if (!g[adj].flag && (g[u].dist != INT_MAX) && (g[u].dist + peso < g[adj].dist)) {
+				g[adj].dist = g[u].dist + peso;
+				/* vai salvando em uma lista pra depois retornar? */
+			}
+			p = p->prox;
+		}
+	}
 	return resp;
 }
 
+/*
+	encontra o vertice nao visitado com menor dist 
+*/
+int encontraMenorDistancia(VERTICE *g, int N) {
+	int min = INT_MAX;
+	int min_idx;
+
+	for (int i = 0; i < N; i++) {
+		if (g[i].flag == 0 && g[i].dist <= min) {
+			min = g[i].dist;
+			min_idx = i;
+		}
+	}
+	return min_idx;
+}
 
 
 //---------------------------------------------------------
