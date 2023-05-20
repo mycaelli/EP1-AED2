@@ -1,3 +1,5 @@
+
+//está retornando o erro: signal: segmentation fault (core dumped)
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
@@ -62,11 +64,11 @@ VERTICE *criaVertices(int N, int *estaAberto) {
 		peso = ijpeso[0 * 3 + 2]
 
 */
-void insereArestas(VERTICE *g, int atual, int *ijpeso) {
-	int origem = ijpeso[atual*3];
-	int destino = ijpeso[atual*3+1];
-	int peso = ijpeso[atual*3+2];
-	
+void insereArestas(VERTICE *g, int origem, int destino, int peso) {
+	//int origem = ijpeso[atual*3];
+	//int destino = ijpeso[atual*3+1];
+	//int peso = ijpeso[atual*3+2];
+
 	NO *novoNo = (NO*)malloc(sizeof(NO));
 	novoNo->adj = destino;
 	novoNo->peso = peso;
@@ -86,83 +88,58 @@ void insereArestas(VERTICE *g, int atual, int *ijpeso) {
 	inicio, fim = busca
 	chave = vertice chave
 */
-// funcao principal
-NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int chave);
-  int encontraMenorDistancia(VERTICE *g, int N){
-	int min = INT_MAX;
-	int min_idx;
 
-	for (int i = 0; i < N; i++) {
-		if (g[i].flag == 0 && g[i].dist <= min) {
-			min = g[i].dist;
-			min_idx = i;
-		}
-	}
+int encontraMenorDistancia(VERTICE *g, int N) {
+    int min = INT_MAX;
+	  int min_idx;
+
+    for (int i = 0; i < N; i++) {
+		    if (g[i].flag == 0 && g[i].dist <= min) {
+			     min = g[i].dist;
+			     min_idx = i;
+		    }
+	  }
 	return min_idx;
 }
-//------------------------------------------
-// O EP consiste em implementar esta funcao
-// e outras funcoes auxiliares que esta
-// necessitar
-//------------------------------------------
-//NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int chave) DUVIDA??? pq essa linha está repetida?
-{ //essa linha estpa dando erro no comppilador porém ao tirar, desencadeia uma série de erros de ivariavel nao declarada e uns outros  
-	NO* resp = NULL;
-	//resp = NULL;
-	bool temChave = false;
 
-  //inicializa grafo
+// funcao principal
+NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int chave){
+  NO* resp;
+	resp = NULL;
+	bool temChave = false;
+  
 	VERTICE* g = criaVertices(N, aberto);
 
 	for (int i = 0; i < A; i++) {
-		//insereArestas(g, i, ijpeso);
-    insereArestas(g, origem, destino, peso);
-    
-	}
+      int origem = ijpeso[i * 3];
+      int destino = ijpeso[i * 3 + 1];
+      int peso = ijpeso[i * 3 + 2];
+      insereArestas(g, destino, origem, peso);
+	 }
 	//...
 
 	/*dist da origem pra ela mesma*/
-	g[inicio].dist = 0;
+	g[inicio].dist = 0; 
 
 	for (int i = 0; i < N; i++) {
-		/*encontra o vertice nao visitado com menor dist*/
 		int u = encontraMenorDistancia(g, N);
-
-		/*
-			se o vertice onde vai fazer a busca nao estiver aberto, pula ele
-		*/
-		if (g[u].aberto && temChave == false) {
-			temChave = true;
-		} else if (!g[u].aberto && temChave == false){
-			continue;
-		} 
-		/* marca o vertice atual como visitado */
-		g[u].flag = 1;
-		
-		//NO* p = grafo[u].inicio; essa linha estava dando erro
-    NO* p = g[u].inicio;
-		while(p) {
-			int adj = p->adj;
-			int peso = p->peso;
-
-			/*
-				se
-					vertice atual nao foi visitado
-					dist do vertice atual nao é infinito -> evita erro de overflow
-					dist do vertice atual é menor que dist do vertice adj
-
-						dist do vertice adj é a dist do vertice atual + peso do vertice adj
-			*/
-			if (!g[adj].flag && (g[u].dist != INT_MAX) && (g[u].dist + peso < g[adj].dist)) {
-				g[adj].dist = g[u].dist + peso;
-        g[adj].via = u;
-				/* vai salvando em uma lista pra depois retornar? */
-			}
-			p = p->prox;
-		}
-	}
- //cria a lista encadeada de nos no resp 
-  if (g[fim].dist != INT_MAX){
+    g[u].flag = 1;
+    
+    NO *adjacente =g[u].inicio;
+    while (adjacente != NULL){ //percorre os adjacentes a u
+      int w = adjacente->adj;
+      int peso = adjacente->peso;
+      if (g[w].flag == 0 && g[u].dist + peso < g[w].dist){ //verifica se o custo p ir de um p outtro é menor do q o q esta acumulado
+        g[w].via = u; //caso seja, ele atualiza indicando q o u é um vertice do caminho
+        g[w].dist = g[u].dist + peso; //atualiza o custo acumulado
+      }
+      if (w == chave && g[u].dist <= g[w].dist){
+        temChave = true; //ve se o vértice é= a chave e casoo custo para ir de u a v é menor ou igual ao custo ja acumulado. se for, o caminho até v pode incluir a passagem pela chave e temChave é definido como verdadeiro.
+      }
+      adjacente = adjacente ->prox;
+    }
+  }
+  if (temChave) {
     int sAtual = fim;
     while (sAtual != inicio){
       NO *novoNo = (NO *)malloc(sizeof(NO));
@@ -172,13 +149,8 @@ NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int cha
 
       sAtual = g[sAtual].via;
     }
-
-    NO *novoNo = (NO *)malloc(sizeof(NO));
-    novoNO->adj = sAtual;
-    novoNO->prox = resp;
-    resp = novoNO;
   }
-  
+		
 	return resp;
 }
 
