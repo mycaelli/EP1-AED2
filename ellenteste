@@ -1,8 +1,5 @@
-
-//está retornando o erro: signal: segmentation fault (core dumped)
 #include <stdio.h>
 #include <stdlib.h>
-#include <malloc.h>
 #include <limits.h> 
 #include <stdbool.h>
 
@@ -64,16 +61,19 @@ VERTICE *criaVertices(int N, int *estaAberto) {
 		peso = ijpeso[0 * 3 + 2]
 
 */
-void insereArestas(VERTICE *g, int origem, int destino, int peso) {
+void insereArestas(VERTICE *g, int origem, int destino, int peso, int N) {
 	//int origem = ijpeso[atual*3];
 	//int destino = ijpeso[atual*3+1];
 	//int peso = ijpeso[atual*3+2];
 
-	NO *novoNo = (NO*)malloc(sizeof(NO));
-	novoNo->adj = destino;
-	novoNo->peso = peso;
-	novoNo->prox = g[origem].inicio;
-	g[origem].inicio = novoNo;
+  //adicionei esse if 
+  if (origem >= 0 && origem < N && destino >= 0 && destino < N) {
+  	NO *novoNo = (NO*)malloc(sizeof(NO));
+  	novoNo->adj = destino;
+  	novoNo->peso = peso;
+  	novoNo->prox = g[origem].inicio;
+  	g[origem].inicio = novoNo;
+  }
 }
 
 /*
@@ -91,7 +91,7 @@ void insereArestas(VERTICE *g, int origem, int destino, int peso) {
 
 int encontraMenorDistancia(VERTICE *g, int N) {
     int min = INT_MAX;
-	  int min_idx;
+	  int min_idx = 0;
 
     for (int i = 0; i < N; i++) {
 		    if (g[i].flag == 0 && g[i].dist <= min) {
@@ -104,9 +104,9 @@ int encontraMenorDistancia(VERTICE *g, int N) {
 
 // funcao principal
 NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int chave){
-  NO* resp;
-	resp = NULL;
-	bool temChave = false;
+  NO* resp = NULL;
+	bool temChave;
+  temChave = false;
   
 	VERTICE* g = criaVertices(N, aberto);
 
@@ -114,7 +114,7 @@ NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int cha
       int origem = ijpeso[i * 3];
       int destino = ijpeso[i * 3 + 1];
       int peso = ijpeso[i * 3 + 2];
-      insereArestas(g, destino, origem, peso);
+      insereArestas(g, origem, destino, peso, N);
 	 }
 	//...
 
@@ -130,11 +130,11 @@ NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int cha
       int w = adjacente->adj;
       int peso = adjacente->peso;
       if (g[w].flag == 0 && g[u].dist + peso < g[w].dist){ //verifica se o custo p ir de um p outtro é menor do q o q esta acumulado
-        g[w].via = u; //caso seja, ele atualiza indicando q o u é um vertice do caminho
-        g[w].dist = g[u].dist + peso; //atualiza o custo acumulado
+        g[w].via = u;
+        g[w].dist = g[u].dist + peso;
       }
-      if (w == chave && g[u].dist <= g[w].dist){
-        temChave = true; //ve se o vértice é= a chave e casoo custo para ir de u a v é menor ou igual ao custo ja acumulado. se for, o caminho até v pode incluir a passagem pela chave e temChave é definido como verdadeiro.
+      if (w == chave && g[u].dist + peso <= g[w].dist){
+        temChave = true;
       }
       adjacente = adjacente ->prox;
     }
