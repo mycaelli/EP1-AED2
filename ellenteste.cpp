@@ -7,16 +7,14 @@
 
 /*
 	OK - preencher grupo e numero usp
-	Vendo isso com thales - ver se pode usar a lib limits e qualquer outra que foi adicionada, se nao puder tem que adaptar o codigo sem elas.
-	- testar todos os cenarios do grafosParaTestes e + o que der
-	- confirmar se precisa ter o peso nos Nos da lista de respostas
-		- se precisar tem que implementar isso
+	VENDO ISSO COM THALES - ver se pode usar a lib limits e qualquer outra que foi adicionada, se nao puder tem que adaptar o codigo sem elas.
+	TESTANDO - testar todos os cenarios do grafosParaTestes e + o que der
+	- confirmar se precisa ter o peso nos Nos da lista de respostas, se precisar tem que implementar isso
 	- verificar se alguma coisa que o prof tinha colocado no arquivo foi apagada sem querer
-	- dar free nas coisas que foram mallocadas 
-		- depois que elas foram usadas
+	- dar free nas coisas que foram mallocadas depois que elas foram usadas
 	OK - deixar o arquivo no formato certo (acho que é .cpp)
 	OK - apagar funcoes nao necessarias: imprimeGrafo
-	- verificar se a condicao de retorno ta certa mesmo 
+	OK / Verifiquei com os testes - verificar se a condicao de retorno ta certa mesmo 
 		- if (*pesoTotalSemChave > *pesoTotalComChave ...)
 	- tratar o codigo pra entradas vazias
 	- TESTAR EM UM WINDOWS!!! 
