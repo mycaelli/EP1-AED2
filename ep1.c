@@ -4,10 +4,30 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h> /*pode incluir?*/
+#include <limits.h>
 #include <stdbool.h>
 
-// lib de bool
+#include "testes.h"
+
+/*
+	- preencher grupo e numero usp
+	- ver se pode usar a lib limits e qualquer outra que foi adicionada
+		- se nao puder tem que adaptar o codigo sem elas
+	- testar todos os cenarios do grafosParaTestes e + o que der
+	- confirmar se precisa ter o peso nos Nos da lista de resposas
+		- se precisar tem que implementar isso
+	- verificar se alguma coisa que o prof tinha colocado no arquivo foi apagada sem querer
+	- dar free nas coisas que foram mallocadas 
+		- depois que elas foram usadas
+	- deixar o arquivo no formato certo 
+		- acho que é .cpp
+	- apagar funcoes nao necessarias 
+		- imprimeGrafo
+	- verificar se a condicao de retorno ta certa mesmo 
+		- if (*pesoTotalSemChave > *pesoTotalComChave ...)
+	- tratar o codigo pra entradas vazias
+	- TESTAR EM UM WINDOWS!!! 
+*/
 
 int grupo() {
   return 0;
@@ -15,7 +35,7 @@ int grupo() {
 
 // ######### ESCREVA O NROUSP AQUI
 int nroUSP1() {
-    return 0;
+    return 10723562;
 }
 
 int nroUSP2() {
@@ -41,11 +61,6 @@ typedef struct
     NO* inicio;
 } VERTICE;
 
-/*
-	funcao cria N vertices
-	inicializa seus campos com 0
-	define se o vertice esta aberto ou fechado a partir do array estaAberto
-*/
 VERTICE *criaVetices(int N, int *estaAberto) {
 	VERTICE *g = (VERTICE*) malloc(sizeof(VERTICE) * (N + 1));
 	for (int i = 1; i <= N; i++) {
@@ -53,46 +68,40 @@ VERTICE *criaVetices(int N, int *estaAberto) {
 		g[i].via = -1;
 		g[i].dist = INT_MAX;
 		g[i].inicio = NULL;
-		g[i].aberto = estaAberto[i];
-		// printf("%d %d %d %d %p %d\n", 
-		// i,		
-		// g[i].flag,
-		// g[i].via,
-		// g[i].dist,
-		// g[i].inicio,
-		// g[i].aberto);
+		g[i].aberto = estaAberto[i-1];
 	}
 	return g;
 }
 
-/*
-	funcao que insere as arestas no grafo
-	ex primeira chamada -> i = 0
-		origem = ijpeso[0 * 3]
-		destino = ijpeso[0 * 3 + 1]
-		peso = ijpeso[0 * 3 + 2]
-
-*/
 void insereArestas(VERTICE *g, int atual, int *ijpeso) {
 	int origem = ijpeso[atual*3];
 	int destino = ijpeso[atual*3+1];
 	int peso = ijpeso[atual*3+2];
-	
-	NO *novoNo = (NO*)malloc(sizeof(NO));
-	if (!novoNo) {
-		printf("erro de alocacao");
-	}
-	novoNo->adj = destino;
-	novoNo->peso = peso;
-	novoNo->prox = g[origem].inicio;
-	g[origem].inicio = novoNo;
+
+	NO* novoNoOrigemDestino = (NO*)malloc(sizeof(NO));
+    if (!novoNoOrigemDestino) {
+        return;
+    }
+    novoNoOrigemDestino->adj = destino;
+    novoNoOrigemDestino->peso = peso;
+    novoNoOrigemDestino->prox = g[origem].inicio;
+    g[origem].inicio = novoNoOrigemDestino;
+	    NO* novoNoDestinoOrigem = (NO*)malloc(sizeof(NO));
+    if (!novoNoDestinoOrigem) {
+        return;
+    }
+    novoNoDestinoOrigem->adj = origem;
+    novoNoDestinoOrigem->peso = peso;
+    novoNoDestinoOrigem->prox = g[destino].inicio;
+    g[destino].inicio = novoNoDestinoOrigem;
 }
 
 // funcao principal
-//NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int chave);
+NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int chave);
 int encontraMenorDistancia(VERTICE *g, int N);
-NO* dijkstra(VERTICE *g, int origem, int destino,  int N, int *pesoTotal);
-void adicionaNosResposta(NO *resp, int adj);
+NO* dijkstra(VERTICE *g, int origem, int destino,  int N, int *pesoTotal, bool *temChave, int chave);
+void adicionaNosResposta(NO *resp, int adj);;
+void reinicializaEAbreVertices(VERTICE *g, int N);
 
 
 void imprimeGrafo(VERTICE *g, int N) {
@@ -113,32 +122,40 @@ void imprimeGrafo(VERTICE *g, int N) {
 // necessitar
 //------------------------------------------
 NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int chave)
-{
-	NO* resp;
-	resp = NULL;
-	int value = 0;
-	int *pesoSemChave = &value;
+{		
+	NO* caminhoSemChave = NULL;
+	NO* caminhoComChave = NULL;
+	int pesoSemChave = 0;
+	int pesoComChave = 0;
 	bool temChave = false;
-
-	// seu codigo AQUI
 
 	VERTICE* g = criaVetices(N, aberto);
 	for (int i = 0; i < A; i++) {
 		insereArestas(g, i, ijpeso);
 	}
-	imprimeGrafo(g, N);
-	resp = dijkstra(g, inicio, fim, N, pesoSemChave);
-	printf("pesoTotal %d\n", *pesoSemChave);
-
-	NO *atual = resp;
-	while(atual) { 
-		printf("%d->", atual->adj);
-		atual = atual->prox;
+	caminhoSemChave = dijkstra(g, inicio, fim, N, &pesoSemChave, &temChave, chave);
+	NO *atual = caminhoSemChave;
+	if (temChave) {
+		reinicializaEAbreVertices(g, N);
+		caminhoComChave = dijkstra(g, inicio, fim, N, &pesoComChave, &temChave, chave);
 	}
+	atual = caminhoComChave;
 
-	/* TEM QUE DAR FREE NO GRAFO */
+	if (pesoComChave <= pesoSemChave && pesoComChave > 0)
+		return caminhoComChave;
+	else if (pesoSemChave > 0)
+		return caminhoSemChave;
 
-	return resp;
+	return NULL;
+}
+
+void reinicializaEAbreVertices(VERTICE *g, int N) {
+	for (int i = 1; i <= N; i++) {
+		g[i].flag = 0;
+		g[i].via = -1;
+		g[i].aberto = 1;
+		g[i].dist = INT_MAX;
+	}
 }
 
 void adicionaNoInicio(NO** resp, int adj) {
@@ -148,16 +165,11 @@ void adicionaNoInicio(NO** resp, int adj) {
     *resp = novoNo;
 }
 
-/*
-	encontra o vertice com dist minima
-*/
-
 int encontraMenorDistancia(VERTICE *g, int N) {
 	int min = INT_MAX;
 	int min_idx = -1;
-
 	for (int i = 1; i <= N; i++) {
-		if (!g[i].flag && g[i].dist <= min) {
+		if (!g[i].flag && g[i].dist <= min && g[i].aberto) {
 			min = g[i].dist;
 			min_idx = i;
 		}
@@ -165,18 +177,22 @@ int encontraMenorDistancia(VERTICE *g, int N) {
 	return min_idx;
 }
 
-NO* dijkstra(VERTICE *g, int origem, int destino,  int N, int *pesoTotal) {
+NO* dijkstra(VERTICE *g, int origem, int destino,  int N, int *pesoTotal, bool *temChave, int chave) {
 	g[origem].dist = 0;
 	g[origem].via = origem;
 
 	for (int i = 1; i <= N; i++) {
-		// if (!g[i].aberto) 
-		// 	continue;
+		if (!g[i].aberto) 
+			continue;
+
 		int u = encontraMenorDistancia(g, N);
 		g[u].flag = 1;
 		NO* p = g[u].inicio;
 		while (p) {
 			int adj = p->adj;
+			if (p->adj == chave) {
+				*temChave = true;
+			}
 			int peso = p->peso;
 			if (!g[adj].flag && g[u].dist != INT_MAX && g[u].dist + peso < g[adj].dist) {
 				g[adj].dist = g[u].dist + peso;
@@ -186,9 +202,7 @@ NO* dijkstra(VERTICE *g, int origem, int destino,  int N, int *pesoTotal) {
 		}
 	}
 
-	// Recuperar o caminho mais curto
     if (g[destino].dist == INT_MAX) {
-        printf("Nao ha caminho entre a origem e o destino.\n");
         return NULL;
     }
 
@@ -218,50 +232,36 @@ NO* dijkstra(VERTICE *g, int origem, int destino,  int N, int *pesoTotal) {
 //---------------------------------------------------------
 int main() {
 
-
-
-	// aqui vc pode incluir codigo de teste
-
-	// exemplo de teste trivial
-
-	// int N=4; // grafo de 3 vÈrtices numerados de 1..3
-	// int aberto[] = {1,1,1,1}; // todos abertos
-	// int inicio=1;
-	// int fim=4;
-	// int chave=2;
-    // int A = 5;
-	// int ijpeso[]={1,2,10, 2,3,20, 3,1,10, 3,4,1, 1,4,3};
-
-    int N = 6;
-    int A = 8;
-    int aberto[] = {1, 1, 1, 1, 1, 0};
-    int inicio = 1;
-    int fim = 5;
-    int chave = 2;
+	// exemplo pdf
+	int N = 9;
+    int A = 10;
+    int aberto[] = {0, 1, 1, 1, 1, 1, 1, 1, 1};
+    int inicio = 7;
+    int fim = 4;
+    int chave = 6;
     int ijpeso[] = {
-        1, 2, 14,
-        1, 6, 3,
-        1, 4, 5,
-        2, 3, 6,
-        2, 6, 5,
-        3, 4, 8,
-        4, 5, 10,
-        5, 6, 8};
+        1, 2, 30,
+        1, 3, 20,
+		2, 7, 30,
+		2, 6, 20,
+		3, 4, 20,
+		3, 7, 80, 
+		4, 9, 80,
+		5, 8, 10,
+		6, 7, 10, 
+		7, 9, 80,};
 
-	// o EP sera testado com uma serie de chamadas como esta
-	//NO* teste = NULL;
+
+	// se o vertice que tem a chave nao for adjacente do melhor caminho mas houver um peso min com os vertices abertos 
 	NO *teste;
 	teste = caminho(N, A, ijpeso, aberto, inicio, fim, chave);
 
-	// NO* ini = teste;
-	// while (ini) {
-	// 	printf("%d\n", ini->adj);
-	// 	ini = ini->prox;
-	// }
-	// for (int i = 0; i < N; i++) {
-	// 	printf("%d ", teste[i]);
-	// }
-	// printf("\n");
+	NO* ini = teste;
+	while (ini) {
+		printf("%d->", ini->adj);
+		ini = ini->prox;
+	}
+	printf("\n");
 	return 0;
 
 }
