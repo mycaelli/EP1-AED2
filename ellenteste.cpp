@@ -7,21 +7,29 @@
 
 /*
 	OK - preencher grupo e numero usp
-	VENDO ISSO COM THALES - ver se pode usar a lib limits e qualquer outra que foi adicionada, se nao puder tem que adaptar o codigo sem elas.
+	OK APARENTEMENTE - ver se pode usar a lib limits e qualquer outra que foi adicionada, se nao puder tem que adaptar o codigo sem elas.
 	TESTANDO - testar todos os cenarios do grafosParaTestes e + o que der
-	- confirmar se precisa ter o peso nos Nos da lista de respostas, se precisar tem que implementar isso
-	- verificar se alguma coisa que o prof tinha colocado no arquivo foi apagada sem querer
-	- dar free nas coisas que foram mallocadas depois que elas foram usadas
+	OK, NÃO PRECISA ("Saída: um ponteiro do tipo NO* representando o caminho de menor custo possível de início até fim, i.e., um percurso válido de salas adjacentes que não inclua acesso inválido a salas trancadas sem que a chave tenha sido previamente obtida, se for o caso.") confirmar se precisa ter o peso nos Nos da lista de respostas, se precisar tem que implementar isso
+	OK - verificar se alguma coisa que o prof tinha colocado no arquivo foi apagada sem querer
+	OK (122) - dar free nas coisas que foram mallocadas depois que elas foram usadas
 	OK - deixar o arquivo no formato certo (acho que é .cpp)
 	OK - apagar funcoes nao necessarias: imprimeGrafo
-	OK / Verifiquei com os testes - verificar se a condicao de retorno ta certa mesmo 
+	OK - verificar se a condicao de retorno ta certa mesmo 
 		- if (*pesoTotalSemChave > *pesoTotalComChave ...)
-	- tratar o codigo pra entradas vazias
-	- TESTAR EM UM WINDOWS!!! 
+	OK -  tratar o codigo pra entradas vazias
+		  TESTE QUE USEI:
+		  int N = 0;
+		    int A = 0;
+		    int aberto[] = {};
+		    int inicio = 0;
+		    int fim = 0;
+		    int chave = 0;
+		    int ijpeso[] = {};
+	OK - TESTAR EM UM WINDOWS!!! 
 */
 
 int grupo() {
-  return 0;
+  return 4;
 }
 
 int nroUSP1() {
@@ -32,6 +40,7 @@ int nroUSP2() {
     return 13719902;
 }
 
+// elemento das listas de adjacência e de resposta
 typedef struct estr 
 {
     int adj; // elemento
@@ -118,6 +127,8 @@ NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int cha
 	else if (pesoSemChave > 0)
 		return caminhoSemChave;
 
+  free(g);
+  
 	return NULL;
 }
 
@@ -201,43 +212,30 @@ NO* dijkstra(VERTICE *g, int origem, int destino,  int N, int *pesoTotal, bool *
 int main() {
 
 	// exemplo pdf
-	int N = 15;
-    int A = 29;
-    int aberto[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1};
-    int inicio = 1;
-    int fim = 8;
-    int chave = 2;
+	int N = 10;
+    int A = 16;
+    int aberto[] = {0, 1, 1, 0, 1, 1, 1, 1, 1, 1};
+    int inicio = 9;
+    int fim = 2;
+    int chave = 7;
     int ijpeso[] = {
-    1, 2, 15,
-    2, 5, 16,
-		1, 8, 2,
-		1, 2, 13,
-		2, 8, 12,
-		2, 9, 14, 
-		3, 4, 8,
-		3, 7, 10,
-    3, 10, 8,
-    3, 13, 6,
-    3, 14, 5,
-    4, 5, 14,
-    4, 9, 5,
-    4, 10, 14,
-    4, 15, 20,
-    5, 6, 9,
-    5, 9, 11,
-    5, 12, 19,
-    6, 11, 9,
-    6, 15, 16,
-    7, 12, 25,
-    8, 10, 7,
-    8, 15, 5,
-    10, 11, 2,
-    10, 13, 13,
-    11, 12, 13,
-    12, 13, 9,
-    13, 14, 18,
-    14, 15, 18};
-
+        1, 2, 10,
+        1, 3, 7,
+        1, 5, 8,
+        1, 8, 14,
+        2, 4, 3,
+        2, 6, 6,
+        2, 10, 18,
+        3, 7, 7,
+        4, 8, 3,
+        4, 8, 15,
+        4, 10, 2,
+        5, 7, 7,
+        5, 9, 5,
+        6, 7, 10,
+        6, 8, 4,
+        7, 10, 7};
+  
 	NO *teste;
 	teste = caminho(N, A, ijpeso, aberto, inicio, fim, chave);
 
