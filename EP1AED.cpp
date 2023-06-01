@@ -1,6 +1,6 @@
 //--------------------------------------------------------------
-// NOMES DOS RESPONSÁVEIS: blablabla E blablabla
-//---
+// NOMES DOS RESPONSÁVEIS: Mycaelli Cerqueira de Lima E Ellen Leal dos Santos
+//--------------------------------------------------------------
 
 #include <stdio.h>
 #include <stdlib.h>
