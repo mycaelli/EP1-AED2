@@ -7,31 +7,6 @@
 #include <limits.h>
 #include <stdbool.h>
 
-//#include "testes.h"
-
-/*
-	OK - preencher grupo e numero usp
-	OK APARENTEMENTE - ver se pode usar a lib limits e qualquer outra que foi adicionada, se nao puder tem que adaptar o codigo sem elas.
-	TESTANDO - testar todos os cenarios do grafosParaTestes e + o que der
-	OK, NÃO PRECISA ("Saída: um ponteiro do tipo NO* representando o caminho de menor custo possível de início até fim, i.e., um percurso válido de salas adjacentes que não inclua acesso inválido a salas trancadas sem que a chave tenha sido previamente obtida, se for o caso.") confirmar se precisa ter o peso nos Nos da lista de respostas, se precisar tem que implementar isso
-	OK - verificar se alguma coisa que o prof tinha colocado no arquivo foi apagada sem querer
-	OK (122) - dar free nas coisas que foram mallocadas depois que elas foram usadas
-	OK - deixar o arquivo no formato certo (acho que é .cpp)
-	OK - apagar funcoes nao necessarias: imprimeGrafo
-	OK - verificar se a condicao de retorno ta certa mesmo 
-		- if (*pesoTotalSemChave > *pesoTotalComChave ...)
-	OK -  tratar o codigo pra entradas vazias
-		  TESTE QUE USEI:
-		  int N = 0;
-		    int A = 0;
-		    int aberto[] = {};
-		    int inicio = 0;
-		    int fim = 0;
-		    int chave = 0;
-		    int ijpeso[] = {};
-	OK - TESTAR EM UM WINDOWS!!! 
-*/
-
 int grupo() {
   return 4;
 }
@@ -98,6 +73,27 @@ void insereArestas(VERTICE *g, int atual, int *ijpeso) {
     g[destino].inicio = novoNoDestinoOrigem;
 }
 
+void freeGrafo(VERTICE *g, int N) {
+	for(int i = 1; i <= N; i++)
+	{
+		NO *p = g[i].inicio;
+		while(p) {
+			NO *temp = p;
+			p = p->prox;
+			free(temp);
+		}
+	}
+	free(g);
+}
+
+void freeCaminho(NO* p) {
+	while(p) {
+		NO *temp = p;
+		p = p->prox;
+		free(temp);
+	}
+}
+
 // funcao principal
 NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int chave);
 int encontraMenorDistancia(VERTICE *g, int N);
@@ -124,15 +120,19 @@ NO *caminho(int N, int A, int *ijpeso, int *aberto, int inicio, int fim, int cha
 		reinicializaEAbreVertices(g, N);
 		caminhoComChave = dijkstra(g, inicio, fim, N, &pesoComChave, &temChave, chave);
 	}
+	freeGrafo(g, N);
+
 	atual = caminhoComChave;
-
 	if (pesoComChave <= pesoSemChave && pesoComChave > 0)
+	{
+		freeCaminho(caminhoSemChave);
 		return caminhoComChave;
+	}
 	else if (pesoSemChave > 0)
+	{
+		freeCaminho(caminhoComChave);
 		return caminhoSemChave;
-
-  free(g);
-  
+	}
 	return NULL;
 }
 
@@ -215,31 +215,26 @@ NO* dijkstra(VERTICE *g, int origem, int destino,  int N, int *pesoTotal, bool *
 
 int main() {
 
-	// exemplo pdf
-	int N = 10;
-    int A = 16;
-    int aberto[] = {0, 1, 1, 0, 1, 1, 1, 1, 1, 1};
-    int inicio = 9;
-    int fim = 2;
-    int chave = 7;
-    int ijpeso[] = {
-        1, 2, 10,
-        1, 3, 7,
-        1, 5, 8,
-        1, 8, 14,
-        2, 4, 3,
-        2, 6, 6,
-        2, 10, 18,
-        3, 7, 7,
-        4, 8, 3,
-        4, 8, 15,
-        4, 10, 2,
-        5, 7, 7,
-        5, 9, 5,
-        6, 7, 10,
-        6, 8, 4,
-        7, 10, 7};
   
+    int N = 8;
+    int A = 12;
+    int aberto[] = {1, 1, 0, 1, 1, 1, 0, 1};
+    int inicio = 5;
+    int fim = 4;
+    int chave = 6;
+    int ijpeso[] = {
+        1, 2, 8,
+        1, 3, 6,
+        1, 5, 9,
+        2, 3, 8,
+        2, 6, 11,
+        2, 7, 7,
+        2, 8, 14,
+        3, 6, 13,
+        3, 8, 2,
+        6, 7, 10,
+        7, 8, 9,
+        8, 4, 8};
 	NO *teste;
 	teste = caminho(N, A, ijpeso, aberto, inicio, fim, chave);
 
@@ -249,6 +244,6 @@ int main() {
 		ini = ini->prox;
 	}
 	printf("\n");
-	return 0;
+	return teste;
 
 }
