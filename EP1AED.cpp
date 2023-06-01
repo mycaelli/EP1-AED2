@@ -1,3 +1,7 @@
+//--------------------------------------------------------------
+// NOMES DOS RESPONSÁVEIS: blablabla E blablabla
+//---
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
