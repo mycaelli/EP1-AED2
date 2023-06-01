@@ -214,15 +214,14 @@ NO* dijkstra(VERTICE *g, int origem, int destino,  int N, int *pesoTotal, bool *
 }
 
 int main() {
-
   
-    int N = 8;
-    int A = 12;
-    int aberto[] = {1, 1, 0, 1, 1, 1, 0, 1};
-    int inicio = 5;
-    int fim = 4;
-    int chave = 6;
-    int ijpeso[] = {
+	int N=8; // grafo de 3 vértices numerados de 1..3
+  int A=12;
+	int aberto[] = {1, 1, 0, 1, 1, 1, 0, 1}; // todos abertos
+	int inicio=5;
+	int fim=4;
+	int chave=6;
+	int ijpeso[]={
         1, 2, 8,
         1, 3, 6,
         1, 5, 9,
@@ -235,15 +234,10 @@ int main() {
         6, 7, 10,
         7, 8, 9,
         8, 4, 8};
-	NO *teste;
-	teste = caminho(N, A, ijpeso, aberto, inicio, fim, chave);
 
-	NO* ini = teste;
-	while (ini) {
-		printf("%d->", ini->adj);
-		ini = ini->prox;
-	}
-	printf("\n");
+	NO* teste = NULL;
+	teste = caminho(A, N, ijpeso, aberto, inicio, fim, chave);
 	return teste;
 
 }
+
